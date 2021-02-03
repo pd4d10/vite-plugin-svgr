@@ -14,6 +14,12 @@ export default {
 }
 ```
 
+Then SVG files can be imported as React components, just like [create-react-app](https://create-react-app.dev/docs/adding-images-fonts-and-files#adding-svgs) does:
+
+```js
+import { ReactComponent as Logo } from './logo.svg';
+```
+
 ## License
 
 MIT
