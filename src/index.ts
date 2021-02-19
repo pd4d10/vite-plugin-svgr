@@ -2,7 +2,11 @@ import fs from 'fs'
 import type { Plugin } from 'vite'
 import type * as E from 'esbuild'
 
-export = function svgrPlugin(): Plugin {
+interface svgrPluginOpts {
+  defaultExport?: 'url' | 'component'
+}
+
+export = function svgrPlugin(opts?: svgrPluginOpts): Plugin {
   // TODO: options
   return {
     name: 'vite:svgr',
@@ -17,20 +21,33 @@ export = function svgrPlugin(): Plugin {
           svg,
           {},
           { componentName: 'ReactComponent' }
-        ).then((res: string) => {
-          return res.replace(
-            'export default ReactComponent',
-            `export { ReactComponent }`
+        )
+        if (opts?.defaultExport === 'component') {
+          const res = await esbuild.transform(componentCode, {
+            loader: 'jsx',
+          })
+
+          return {
+            code: res.code,
+            // map: res.map, // TODO:
+          }
+        } else {
+          const res = await esbuild.transform(
+            componentCode.replace(
+              'export default ReactComponent',
+              `export { ReactComponent }`
+            ) +
+              '\n' +
+              code,
+            {
+              loader: 'jsx',
+            }
           )
-        })
 
-        const res = await esbuild.transform(componentCode + '\n' + code, {
-          loader: 'jsx',
-        })
-
-        return {
-          code: res.code,
-          // map: res.map, // TODO:
+          return {
+            code: res.code,
+            // map: res.map, // TODO:
+          }
         }
       }
     },
