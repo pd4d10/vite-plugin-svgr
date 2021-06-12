@@ -30,7 +30,7 @@ export = function svgrPlugin(): Plugin {
 
         return {
           code: res.code,
-          // map: res.map, // TODO:
+          map: null, // TODO:
         }
       }
     },
