@@ -13,7 +13,8 @@
     "url": "git+https://github.com/pd4d10/vite-plugin-svgr.git"
   },
   "files": [
-    "lib"
+    "lib",
+    "client.d.ts"
   ],
   "keywords": [
     "vite"
