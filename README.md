@@ -4,23 +4,15 @@
 
 Vite plugin to transform SVGs into React components. Uses [svgr](https://github.com/gregberge/svgr) under the hood.
 
-## Prerequisites:
-
-add `vite-plugin-svgr/client` to `compilerOptions.types` of your `tsconfig`
-
-```js
-"types": ["vite-plugin-svgr/client"]
-```
-
 ## Usage
 
 ```js
 // vite.config.js
-import svgr from 'vite-plugin-svgr'
+import svgrPlugin from 'vite-plugin-svgr'
 
 export default {
   // ...
-  plugins: [svgr()],
+  plugins: [svgrPlugin()],
 }
 ```
 
@@ -28,6 +20,18 @@ Then SVG files can be imported as React components, just like [create-react-app]
 
 ```js
 import { ReactComponent as Logo } from './logo.svg'
+```
+
+If you are using TypeScript, `vite-plugin-svgr/client` can be added to `tsconfig.json`:
+
+```json
+{
+  // ...
+  "compilerOptions": {
+    // ...
+    "types": ["vite-plugin-svgr/client"]
+  }
+}
 ```
 
 ## License
