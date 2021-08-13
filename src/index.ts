@@ -1,8 +1,8 @@
 import fs from 'fs'
-import type { Plugin } from 'vite'
+import type {Plugin} from 'vite'
 import type * as E from 'esbuild'
 
-export = function svgrPlugin(): Plugin {
+export default function svgrPlugin(): Plugin {
   // TODO: options
   return {
     name: 'vite:svgr',
@@ -16,7 +16,7 @@ export = function svgrPlugin(): Plugin {
         const componentCode = await svgr(
           svg,
           {},
-          { componentName: 'ReactComponent' }
+          {componentName: 'ReactComponent'}
         ).then((res: string) => {
           return res.replace(
             'export default ReactComponent',
