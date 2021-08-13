@@ -1,12 +1,18 @@
 import fs from 'fs'
-import type { Plugin } from 'vite'
+import type {Plugin} from 'vite'
 import type * as E from 'esbuild'
 
-export = function svgrPlugin(): Plugin {
-  // TODO: options
+export interface Options {
+  svgr?: {};
+  svgrState?: {};
+  esbuild?: {}
+  defaultExport?: boolean;
+};
+
+export default function svgrPlugin(options?: Options): Plugin {
   return {
     name: 'vite:svgr',
-    async transform(code, id) {
+    async transform(code: string, id: string) {
       if (id.endsWith('.svg')) {
         const svgr = require('@svgr/core').default
         const esbuild = require('esbuild') as typeof E
@@ -15,22 +21,22 @@ export = function svgrPlugin(): Plugin {
 
         const componentCode = await svgr(
           svg,
-          {},
-          { componentName: 'ReactComponent' }
+          {...options?.svgr},
+          {componentName: 'ReactComponent', ...options?.svgrState}
         ).then((res: string) => {
-          return res.replace(
-            'export default ReactComponent',
-            `export { ReactComponent }`
-          )
+          return options?.defaultExport ? res : res.replace(
+            /export default ([a-zA-Z0-9_$]+)/,
+            `export { $1 }`
+          );
         })
 
         const res = await esbuild.transform(componentCode + '\n' + code, {
           loader: 'jsx',
+          ...options?.esbuild
         })
-
         return {
           code: res.code,
-          map: null, // TODO:
+          map: null,
         }
       }
     },
