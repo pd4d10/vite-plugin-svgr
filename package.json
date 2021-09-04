@@ -34,6 +34,7 @@
     "vite": "^2.0.0"
   },
   "dependencies": {
-    "@svgr/core": "^5.5.0"
+    "@svgr/core": "^5.5.0",
+    "esbuild": "^0.12.25"
   }
 }
