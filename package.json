@@ -26,9 +26,9 @@
   },
   "homepage": "https://github.com/pd4d10/vite-plugin-svgr#readme",
   "devDependencies": {
-    "@types/node": "^15.12.2",
-    "typescript": "^4.3.2",
-    "vite": "^2.3.7"
+    "@types/node": "^16.11.6",
+    "typescript": "^4.4.4",
+    "vite": "^2.6.13"
   },
   "peerDependencies": {
     "vite": "^2.0.0"
