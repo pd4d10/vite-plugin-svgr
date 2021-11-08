@@ -1,7 +1,7 @@
 import fs from 'fs'
 import { transformWithEsbuild, Plugin } from 'vite'
 
-export = function svgrPlugin(): Plugin {
+export default function svgrPlugin(): Plugin {
   // TODO: options
   return {
     name: 'vite:svgr',
