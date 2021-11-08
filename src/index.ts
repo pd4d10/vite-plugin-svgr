@@ -7,7 +7,7 @@ export = function svgrPlugin(): Plugin {
   return {
     name: 'vite:svgr',
     async transform(code, id) {
-      if (id.endsWith('.svg')) {
+      if (id.endsWith('.svg') && !id.includes('node_modules')) {
         const svgr = require('@svgr/core').default
         const esbuild = require('esbuild') as typeof E
 
