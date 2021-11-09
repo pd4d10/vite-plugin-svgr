@@ -11,20 +11,21 @@ export default function svgrPlugin(): Plugin {
         const { default: convert } = await import('@svgr/core')
 
         const svgCode = await fs.promises.readFile(id, 'utf8')
-        const componentCode = await convert(
+        let componentCode = await convert(
           svgCode,
           {},
           { componentName: 'ReactComponent' }
         )
-        code =
-          code +
-          '\n' +
-          componentCode.replace(
-            'export default ReactComponent',
-            'export { ReactComponent }'
-          )
+        componentCode = componentCode.replace(
+          'export default ReactComponent',
+          'export { ReactComponent }'
+        )
 
-        const res = await transformWithEsbuild(code, id, { loader: 'jsx' })
+        const res = await transformWithEsbuild(
+          componentCode + '\n' + code,
+          id,
+          { loader: 'jsx' }
+        )
 
         return {
           code: res.code,
