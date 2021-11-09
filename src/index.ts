@@ -6,7 +6,8 @@ export default function svgrPlugin(): Plugin {
   return {
     name: 'vite:svgr',
     async transform(code, id) {
-      if (id.endsWith('.svg') && !id.includes('node_modules')) {
+      if (id.endsWith('.svg')) {
+        // TODO: exclude node_modules as an option
         const { default: convert } = await import('@svgr/core')
 
         const svgCode = await fs.promises.readFile(id, 'utf8')
