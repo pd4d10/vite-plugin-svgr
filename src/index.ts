@@ -1,25 +1,31 @@
 import fs from 'fs'
-import { transformWithEsbuild, Plugin } from 'vite'
+import type { Config } from '@svgr/core'
+import { transformWithEsbuild } from 'vite'
+import type { Plugin } from 'vite'
 
-export default function svgrPlugin(): Plugin {
-  // TODO: options
+type Options = {
+  svgrOptions?: Config
+}
+
+export = function svgrPlugin(options: Options = {}): Plugin {
+  const { svgrOptions = {} } = options
+
   return {
     name: 'vite:svgr',
     async transform(code, id) {
       if (id.endsWith('.svg')) {
-        // TODO: exclude node_modules as an option
-        const { default: convert } = await import('@svgr/core')
+        const { transform: convert } = await import('@svgr/core')
 
         const svgCode = await fs.promises.readFile(id, 'utf8')
-        let componentCode = await convert(
-          svgCode,
-          {},
-          { componentName: 'ReactComponent' }
-        )
-        componentCode = componentCode.replace(
-          'export default ReactComponent',
-          'export { ReactComponent }'
-        )
+
+        const componentCode = await convert(svgCode, svgrOptions, {
+          componentName: 'ReactComponent',
+        }).then((res) => {
+          return res.replace(
+            'export default ReactComponent',
+            `export { ReactComponent }`
+          )
+        })
 
         const res = await transformWithEsbuild(
           componentCode + '\n' + code,
