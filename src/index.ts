@@ -5,11 +5,13 @@ import type { Plugin } from 'vite'
 
 type Options = {
   svgrOptions?: Config
+  esbuildOptions?: Parameters<typeof transformWithEsbuild>[2]
 }
 
-export = function svgrPlugin(options: Options = {}): Plugin {
-  const { svgrOptions = {} } = options
-
+export = function svgrPlugin({
+  svgrOptions,
+  esbuildOptions,
+}: Options = {}): Plugin {
   return {
     name: 'vite:svgr',
     async transform(code, id) {
@@ -30,7 +32,7 @@ export = function svgrPlugin(options: Options = {}): Plugin {
         const res = await transformWithEsbuild(
           componentCode + '\n' + code,
           id,
-          { loader: 'jsx' }
+          { loader: 'jsx', ...esbuildOptions }
         )
 
         return {
