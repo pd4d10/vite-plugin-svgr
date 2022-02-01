@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "tsc --watch",
     "build": "tsc",
-    "prepublish": "npm run build"
+    "prepare": "npm run build"
   },
   "repository": "pd4d10/vite-plugin-svgr",
   "files": [
