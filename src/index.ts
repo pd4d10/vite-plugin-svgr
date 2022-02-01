@@ -5,12 +5,14 @@ import type { Plugin } from 'vite'
 
 type Options = {
   svgrOptions?: Config
-  esbuildOptions?: Parameters<typeof transformWithEsbuild>[2]
+  esbuildOptions?: Parameters<typeof transformWithEsbuild>[2],
+  importAsDefault?: boolean
 }
 
 export = function svgrPlugin({
   svgrOptions,
   esbuildOptions,
+  importAsDefault
 }: Options = {}): Plugin {
   return {
     name: 'vite:svgr',
@@ -23,7 +25,7 @@ export = function svgrPlugin({
         const componentCode = await convert(svgCode, svgrOptions, {
           componentName: 'ReactComponent',
         }).then((res) => {
-          return res.replace(
+          return importAsDefault ? res : res.replace(
             'export default ReactComponent',
             `export { ReactComponent }`
           )
