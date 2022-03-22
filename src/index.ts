@@ -22,6 +22,7 @@ export = function svgrPlugin({
 
         const componentCode = await convert(svgCode, svgrOptions, {
           componentName: 'ReactComponent',
+          filePath: id,
         }).then((res) => {
           return res.replace(
             'export default ReactComponent',
