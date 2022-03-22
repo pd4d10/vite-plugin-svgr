@@ -23,7 +23,7 @@ export = function svgrPlugin({
         let svgCode = await fs.promises.readFile(id, 'utf8')
 
         if (localStyle) {
-          const regex = new RegExp(/[>|\}]\.([^\{]+)\{/gm)
+          const regex = new RegExp(/[>|\}]\s*\.([^\{]+)\{/gm)
           let match: RegExpExecArray | null; 
           let classMap : Record<string, string>= {};
           while ((match = regex.exec(svgCode)) !== null) {
