@@ -27,8 +27,14 @@ export = function svgrPlugin({
           let match: RegExpExecArray | null; 
           let classMap : Record<string, string>= {};
           while ((match = regex.exec(svgCode)) !== null) {
-            let classes = match[1].split(".")
-            classes = classes.map(c => c.replace(",",""))
+            let groups = match[1].split(".");
+            let classes: string[] = [];
+            for (let i = 0; i < groups.length; i++) {
+              let current = groups[i].replace(/\s+/gm, "");
+              if (!current) continue
+              current = current.replace(/,/gm, "");
+              classes.push(current);
+            }
             classes.forEach(c => {
               let uid = Math.random().toString(16).substr(2);
               classMap[c] = uid;
