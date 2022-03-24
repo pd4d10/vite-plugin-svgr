@@ -24,10 +24,15 @@ export = function svgrPlugin({
           componentName: 'ReactComponent',
           filePath: id,
         }).then((res) => {
-          return res.replace(
-            'export default ReactComponent',
-            `export { ReactComponent }`
-          )
+          const searchValue = svgrOptions?.ref
+            ? 'export default ForwardRef'
+            : 'export default ReactComponent'
+
+          const replaceValue = svgrOptions?.ref
+            ? 'export { ForwardRef as ReactComponent }'
+            : 'export { ReactComponent }'
+
+          return res.replace(searchValue, replaceValue)
         })
 
         const res = await transformWithEsbuild(
