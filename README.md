@@ -18,6 +18,8 @@ export default {
         icon: true,
         // ...svgr options (https://react-svgr.com/docs/options/)
       },
+      // esbuildOptions: { ... }
+      // exportComponentAsDefault: false
     }),
   ],
 }
@@ -27,6 +29,7 @@ Then SVG files can be imported as React components, just like [create-react-app]
 
 ```js
 import { ReactComponent as Logo } from './logo.svg'
+import Logo from './logo.svg' // with `exportComponentAsDefault: true`
 ```
 
 If you are using TypeScript, `vite-plugin-svgr/client` can be added to `tsconfig.json`:
