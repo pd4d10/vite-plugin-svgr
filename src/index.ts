@@ -3,17 +3,17 @@ import type { Config } from '@svgr/core'
 import { transformWithEsbuild } from 'vite'
 import type { Plugin } from 'vite'
 
-type Options = {
+export interface ViteSvgrOptions {
   svgrOptions?: Config
   esbuildOptions?: Parameters<typeof transformWithEsbuild>[2]
 }
 
-export default function svgrPlugin({
+export default function viteSvgr({
   svgrOptions,
   esbuildOptions,
-}: Options = {}): Plugin {
+}: ViteSvgrOptions = {}): Plugin {
   return {
-    name: 'vite:svgr',
+    name: 'vite-plugin-svgr',
     async transform(code, id) {
       if (id.endsWith('.svg')) {
         const { transform } = await import('@svgr/core')
