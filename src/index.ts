@@ -16,30 +16,20 @@ export default function svgrPlugin({
     name: 'vite:svgr',
     async transform(code, id) {
       if (id.endsWith('.svg')) {
-        const { transform: convert } = await import('@svgr/core')
-
+        const { transform } = await import('@svgr/core')
         const svgCode = await fs.promises.readFile(id, 'utf8')
 
-        const componentCode = await convert(svgCode, svgrOptions, {
-          componentName: 'ReactComponent',
+        const componentCode = await transform(svgCode, svgrOptions, {
           filePath: id,
-        }).then((res) => {
-          const searchValue = svgrOptions?.ref
-            ? 'export default ForwardRef'
-            : 'export default ReactComponent'
-
-          const replaceValue = svgrOptions?.ref
-            ? 'export { ForwardRef as ReactComponent }'
-            : 'export { ReactComponent }'
-
-          return res.replace(searchValue, replaceValue)
+          caller: {
+            previousExport: code,
+          },
         })
 
-        const res = await transformWithEsbuild(
-          componentCode + '\n' + code,
-          id,
-          { loader: 'jsx', ...esbuildOptions }
-        )
+        const res = await transformWithEsbuild(componentCode, id, {
+          loader: 'jsx',
+          ...esbuildOptions,
+        })
 
         return {
           code: res.code,
