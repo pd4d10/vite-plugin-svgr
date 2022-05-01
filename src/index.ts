@@ -8,7 +8,7 @@ type Options = {
   esbuildOptions?: Parameters<typeof transformWithEsbuild>[2]
 }
 
-export = function svgrPlugin({
+export default function svgrPlugin({
   svgrOptions,
   esbuildOptions,
 }: Options = {}): Plugin {
