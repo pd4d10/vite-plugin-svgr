@@ -4,11 +4,19 @@ import { transformWithEsbuild } from 'vite'
 import type { Plugin } from 'vite'
 
 export interface ViteSvgrOptions {
+  /**
+   * Export React component as default. Notice that it will overrides
+   * the default behavior of Vite, which exports the URL as default
+   *
+   * @default false
+   */
+  exportAsDefault?: boolean
   svgrOptions?: Config
   esbuildOptions?: Parameters<typeof transformWithEsbuild>[2]
 }
 
 export default function viteSvgr({
+  exportAsDefault,
   svgrOptions,
   esbuildOptions,
 }: ViteSvgrOptions = {}): Plugin {
@@ -22,7 +30,7 @@ export default function viteSvgr({
         const componentCode = await transform(svgCode, svgrOptions, {
           filePath: id,
           caller: {
-            previousExport: code,
+            previousExport: exportAsDefault ? null : code,
           },
         })
 
