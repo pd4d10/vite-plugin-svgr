@@ -34,7 +34,8 @@
     "vite": "^2.9.6"
   },
   "peerDependencies": {
-    "vite": "^2.6.0"
+    "vite": "^2.6.0",
+    "react": ">=17"
   },
   "dependencies": {
     "@svgr/core": "^6.2.1"
