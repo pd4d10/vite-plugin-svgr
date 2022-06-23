@@ -37,6 +37,7 @@
     "vite": "^2.6.0 || 3"
   },
   "dependencies": {
+    "@rollup/pluginutils": "^4.2.1",
     "@svgr/core": "^6.2.1"
   }
 }
