@@ -2,6 +2,7 @@ import fs from 'fs'
 import type { Config } from '@svgr/core'
 import { transformWithEsbuild } from 'vite'
 import type { Plugin } from 'vite'
+import { createFilter, FilterPattern } from '@rollup/pluginutils'
 
 export interface ViteSvgrOptions {
   /**
@@ -13,17 +14,22 @@ export interface ViteSvgrOptions {
   exportAsDefault?: boolean
   svgrOptions?: Config
   esbuildOptions?: Parameters<typeof transformWithEsbuild>[2]
+  exclude?: FilterPattern
+  include?: FilterPattern
 }
 
 export default function viteSvgr({
   exportAsDefault,
   svgrOptions,
   esbuildOptions,
+  include = '**/*.svg',
+  exclude,
 }: ViteSvgrOptions = {}): Plugin {
+  const filter = createFilter(include, exclude)
   return {
     name: 'vite-plugin-svgr',
     async transform(code, id) {
-      if (id.endsWith('.svg')) {
+      if (filter(id)) {
         const { transform } = await import('@svgr/core')
         const svgCode = await fs.promises.readFile(id, 'utf8')
 
