@@ -3,6 +3,8 @@ import type { Config } from '@svgr/core'
 import { transformWithEsbuild } from 'vite'
 import type { Plugin } from 'vite'
 import { createFilter, FilterPattern } from '@rollup/pluginutils'
+import svgo from '@svgr/plugin-svgo'
+import jsx from '@svgr/plugin-jsx'
 
 export interface ViteSvgrOptions {
   /**
@@ -37,6 +39,7 @@ export default function viteSvgr({
           filePath: id,
           caller: {
             previousExport: exportAsDefault ? null : code,
+            defaultPlugins: [svgo, jsx]
           },
         })
 
