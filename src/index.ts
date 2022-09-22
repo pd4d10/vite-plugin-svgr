@@ -39,7 +39,7 @@ export default function viteSvgr({
           filePath: id,
           caller: {
             previousExport: exportAsDefault ? null : code,
-            defaultPlugins: [svgo, jsx]
+            defaultPlugins: svgrOptions?.svgo ? [svgo, jsx] : [jsx]
           },
         })
 
