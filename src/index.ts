@@ -31,7 +31,7 @@ export default function viteSvgr({
     async transform(code, id) {
       if (filter(id)) {
         const { transform } = await import('@svgr/core')
-        const svgCode = await fs.promises.readFile(id, 'utf8')
+        const svgCode = await fs.promises.readFile(id.replace(/\?.*$/, ""), 'utf8')
 
         const componentCode = await transform(svgCode, svgrOptions, {
           filePath: id,
