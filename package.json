@@ -1,6 +1,6 @@
 {
   "name": "vite-plugin-svgr",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "description": "Vite plugin to transform SVGs into React components",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
