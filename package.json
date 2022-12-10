@@ -40,5 +40,6 @@
   "dependencies": {
     "@rollup/pluginutils": "^5.0.2",
     "@svgr/core": "^6.5.1"
-  }
+  },
+  "packageManager": "pnpm@7.14.2"
 }
