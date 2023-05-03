@@ -16,6 +16,7 @@ export interface ViteSvgrOptions {
   esbuildOptions?: Parameters<typeof transformWithEsbuild>[2]
   exclude?: FilterPattern
   include?: FilterPattern
+  includeSvgAssets?: boolean;
 }
 
 export default function viteSvgr({
@@ -24,10 +25,15 @@ export default function viteSvgr({
   esbuildOptions,
   include = '**/*.svg',
   exclude,
+  includeSvgAssets
 }: ViteSvgrOptions = {}): Plugin {
   const filter = createFilter(include, exclude)
   return {
     name: 'vite-plugin-svgr',
+    enforce: !includeSvgAssets ? 'pre' : undefined,
+    load(id) {
+      return !includeSvgAssets && filter(id) ? "" : null;
+    },
     async transform(code, id) {
       if (filter(id)) {
         const { transform } = await import('@svgr/core')
