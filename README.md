@@ -33,7 +33,7 @@ If you are using TypeScript, there is also a declaration helper for better type 
 ```js
 svgr({
   // Set it to `true` to export React component as default.
-  // Notice that it will overrides the default behavior of Vite.
+  // Notice that it will override the default behavior of Vite.
   exportAsDefault: false,
 
   // svgr options: https://react-svgr.com/docs/options/
