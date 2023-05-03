@@ -44,5 +44,5 @@
     "@rollup/pluginutils": "^5.0.2",
     "@svgr/core": "^7.0.0"
   },
-  "packageManager": "pnpm@7.14.2"
+  "packageManager": "pnpm@8.4.0"
 }
