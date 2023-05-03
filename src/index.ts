@@ -31,6 +31,8 @@ export default function viteSvgr({
     async transform(code, id) {
       if (filter(id)) {
         const { transform } = await import("@svgr/core");
+        const { default: jsx } = await import("@svgr/plugin-jsx");
+
         const svgCode = await fs.promises.readFile(
           id.replace(/\?.*$/, ""),
           "utf8"
@@ -40,6 +42,7 @@ export default function viteSvgr({
           filePath: id,
           caller: {
             previousExport: exportAsDefault ? null : code,
+            defaultPlugins: [jsx],
           },
         });
 
