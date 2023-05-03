@@ -8,7 +8,8 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
     },
     "./client": {
       "types": "./client.d.ts"
@@ -16,7 +17,7 @@
   },
   "scripts": {
     "dev": "tsc --watch",
-    "build": "tsc",
+    "build": "tsc --module commonjs && mv dist/index.js dist/index.cjs && tsc",
     "prepare": "npm run build"
   },
   "repository": "pd4d10/vite-plugin-svgr",
