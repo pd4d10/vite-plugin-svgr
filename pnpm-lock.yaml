@@ -5,10 +5,10 @@ dependencies:
     specifier: ^5.0.2
     version: 5.0.2
   '@svgr/core':
-    specifier: ^7.0.0
+    specifier: ^7.0.0 || ^8.0.0
     version: 7.0.0
   '@svgr/plugin-jsx':
-    specifier: ^7.0.0
+    specifier: ^7.0.0 || ^8.0.0
     version: 7.0.0
 
 devDependencies:

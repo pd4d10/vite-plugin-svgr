@@ -41,8 +41,8 @@
   },
   "dependencies": {
     "@rollup/pluginutils": "^5.0.2",
-    "@svgr/core": "^7.0.0",
-    "@svgr/plugin-jsx": "^7.0.0"
+    "@svgr/core": "^7.0.0 || ^8.0.0",
+    "@svgr/plugin-jsx": "^7.0.0 || ^8.0.0"
   },
   "packageManager": "pnpm@8.4.0"
 }
