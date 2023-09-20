@@ -26,6 +26,8 @@ export default function viteSvgr({
   exclude,
 }: ViteSvgrOptions = {}): Plugin {
   const filter = createFilter(include, exclude);
+  const postfixRE = /[?#].*$/s;
+
   return {
     name: "vite-plugin-svgr",
     async transform(code, id) {
@@ -33,13 +35,11 @@ export default function viteSvgr({
         const { transform } = await import("@svgr/core");
         const { default: jsx } = await import("@svgr/plugin-jsx");
 
-        const svgCode = await fs.promises.readFile(
-          id.replace(/\?.*$/, ""),
-          "utf8"
-        );
+        const filePath = id.replace(postfixRE, "");
+        const svgCode = await fs.promises.readFile(filePath, "utf8");
 
         const componentCode = await transform(svgCode, svgrOptions, {
-          filePath: id,
+          filePath,
           caller: {
             previousExport: exportAsDefault ? null : code,
             defaultPlugins: [jsx],
