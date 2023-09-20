@@ -16,10 +16,10 @@ export default {
 };
 ```
 
-Then SVG files can be imported as React components, just like [create-react-app](https://create-react-app.dev/docs/adding-images-fonts-and-files#adding-svgs) does:
+Then SVG files can be imported as React components:
 
 ```js
-import { ReactComponent as Logo } from "./logo.svg";
+import Logo from "./logo.svg?react";
 ```
 
 If you are using TypeScript, there is also a declaration helper for better type inference:
@@ -32,10 +32,6 @@ If you are using TypeScript, there is also a declaration helper for better type 
 
 ```js
 svgr({
-  // Set it to `true` to export React component as default.
-  // Notice that it will override the default behavior of Vite.
-  exportAsDefault: false,
-
   // svgr options: https://react-svgr.com/docs/options/
   svgrOptions: {
     // ...
@@ -46,8 +42,8 @@ svgr({
     // ...
   },
 
-  //  A minimatch pattern, or array of patterns, which specifies the files in the build the plugin should include. By default all svg files will be included.
-  include: "**/*.svg",
+  // A minimatch pattern, or array of patterns, which specifies the files in the build the plugin should include. By default all svg files will be included.
+  include: "**/*.svg?react",
 
   //  A minimatch pattern, or array of patterns, which specifies the files in the build the plugin should ignore. By default no files are ignored.
   exclude: "",
