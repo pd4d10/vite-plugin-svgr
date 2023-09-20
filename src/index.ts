@@ -4,27 +4,19 @@ import fs from "fs";
 import type { Plugin } from "vite";
 import { transformWithEsbuild } from "vite";
 
-export interface ViteSvgrOptions {
-  /**
-   * Export React component as default. Notice that it will overrides
-   * the default behavior of Vite, which exports the URL as default
-   *
-   * @default false
-   */
-  exportAsDefault?: boolean;
+export interface VitePluginSvgrOptions {
   svgrOptions?: Config;
   esbuildOptions?: Parameters<typeof transformWithEsbuild>[2];
   exclude?: FilterPattern;
   include?: FilterPattern;
 }
 
-export default function viteSvgr({
-  exportAsDefault,
+export default function vitePluginSvgr({
   svgrOptions,
   esbuildOptions,
-  include = "**/*.svg",
+  include = "**/*.svg?react",
   exclude,
-}: ViteSvgrOptions = {}): Plugin {
+}: VitePluginSvgrOptions = {}): Plugin {
   const filter = createFilter(include, exclude);
   const postfixRE = /[?#].*$/s;
 
@@ -41,7 +33,6 @@ export default function viteSvgr({
         const componentCode = await transform(svgCode, svgrOptions, {
           filePath,
           caller: {
-            previousExport: exportAsDefault ? null : code,
             defaultPlugins: [jsx],
           },
         });
