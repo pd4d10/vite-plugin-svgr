@@ -20,8 +20,8 @@ dependencies:
 
 devDependencies:
   '@types/node':
-    specifier: ^20.6.2
-    version: 20.6.2
+    specifier: ^20.7.2
+    version: 20.7.2
   typescript:
     specifier: ^5.2.2
     version: 5.2.2
@@ -601,6 +601,11 @@ packages:
 
   /@types/node@20.6.2:
     resolution: {integrity: sha512-Y+/1vGBHV/cYk6OI1Na/LHzwnlNCAfU3ZNGrc1LdRe/LAIbdDPTTv/HU3M7yXN448aTVDq3eKRm2cg7iKLb8gw==}
+    dev: false
+
+  /@types/node@20.7.2:
+    resolution: {integrity: sha512-RcdC3hOBOauLP+r/kRt27NrByYtDjsXyAuSbR87O6xpsvi763WI+5fbSIvYJrXnt9w4RuxhV6eAXfIs7aaf/FQ==}
+    dev: true
 
   /ansi-styles@3.2.1:
     resolution: {integrity: sha512-VT0ZI6kZRdTh8YyJw3SMbYm/u+NqfsAxEpWO0Pf9sq8/e94WxxOpPKx9FR1FlyCtOVDNOQ+8ntlqFxiRc+r5qA==}

@@ -32,7 +32,7 @@
   "author": "Rongjian Zhang",
   "license": "MIT",
   "devDependencies": {
-    "@types/node": "^20.6.2",
+    "@types/node": "^20.7.2",
     "typescript": "^5.2.2"
   },
   "peerDependencies": {
