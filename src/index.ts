@@ -22,7 +22,8 @@ export default function vitePluginSvgr({
 
   return {
     name: "vite-plugin-svgr",
-    async transform(code, id) {
+    enforce: "pre", // to override `vite:asset`'s behavior
+    async load(id) {
       if (filter(id)) {
         const { transform } = await import("@svgr/core");
         const { default: jsx } = await import("@svgr/plugin-jsx");
