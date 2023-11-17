@@ -5,6 +5,7 @@
 Vite plugin to transform SVGs into React components. Uses [svgr](https://github.com/gregberge/svgr) under the hood.
 
 ## Installation
+
 ```sh
 # npm
 npm install --save-dev vite-plugin-svgr
@@ -67,7 +68,7 @@ If you want to enable SVGO you can install `@svgr/plugin-svgo` and use following
 ```js
 svgr({
   svgrOptions: {
-    plugins: ['@svgr/plugin-svgo', '@svgr/plugin-jsx'],
+    plugins: ["@svgr/plugin-svgo", "@svgr/plugin-jsx"],
     svgoConfig: {
       floatPrecision: 2,
     },
