@@ -62,6 +62,20 @@ svgr({
 });
 ```
 
+If you want to enable SVGO you can install `@svgr/plugin-svgo` and use following options to enable and configure it:
+
+```js
+svgr({
+  svgrOptions: {
+    plugins: ['@svgr/plugin-svgo', '@svgr/plugin-jsx'],
+    svgoConfig: {
+      floatPrecision: 2,
+    },
+  },
+  // ...
+});
+```
+
 ## License
 
 MIT
