@@ -23,7 +23,8 @@
   "repository": "pd4d10/vite-plugin-svgr",
   "files": [
     "dist",
-    "client.d.ts"
+    "client.d.ts",
+    "codemods"
   ],
   "keywords": [
     "vite",
