@@ -77,6 +77,21 @@ svgr({
 });
 ```
 
+If you want to use TypeScript, i.e., generate `.tsx` components, you need to set `typescript: true` in `svgrOptions` and `loader: 'tsx'` in `esbuildOptions`:
+
+```ts
+svgr({
+  svgrOptions: {
+    typescript: true,
+  },
+  esbuildOptions: {
+    loader: 'tsx',
+  },
+})
+```
+
+(Setting `typescript: true` will add `import type { SVGProps } from "react";` to the generated component, which esbuild won't recognize as valid syntax without setting `loader: 'tsx'`.)
+
 ## License
 
 MIT
