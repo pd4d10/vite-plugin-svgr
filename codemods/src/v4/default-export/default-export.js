@@ -7,7 +7,7 @@ module.exports = function (file, api) {
 
     if (importPath.endsWith(".svg")) {
       const hasDefaultSpecifier = path.node.specifiers.some((specifier) =>
-        jscodeshift.ImportDefaultSpecifier.check(specifier)
+        jscodeshift.ImportDefaultSpecifier.check(specifier),
       );
 
       // Skip transformation if there is a default import specifier
@@ -18,7 +18,7 @@ module.exports = function (file, api) {
           if (jscodeshift.ImportSpecifier.check(specifier)) {
             // Convert named import to default import
             const newSpecifier = jscodeshift.importDefaultSpecifier(
-              jscodeshift.identifier(specifier.local.name)
+              jscodeshift.identifier(specifier.local.name),
             );
             specifier.type = "ImportDefaultSpecifier";
             specifier.local = newSpecifier.local;
