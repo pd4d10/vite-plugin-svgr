@@ -33,8 +33,8 @@
   "author": "Rongjian Zhang",
   "license": "MIT",
   "devDependencies": {
-    "@types/node": "^20.11.17",
-    "typescript": "^5.3.3"
+    "@types/node": "^20.14.1",
+    "typescript": "^5.4.5"
   },
   "peerDependencies": {
     "vite": ">=2.6.0"
@@ -44,5 +44,5 @@
     "@svgr/core": "^8.1.0",
     "@svgr/plugin-jsx": "^8.1.0"
   },
-  "packageManager": "pnpm@8.15.1+sha256.245fe901f8e7fa8782d7f17d32b6a83995e2ae03984cb5b62b8949bfdc27c7b5"
+  "packageManager": "pnpm@9.1.4+sha512.9df9cf27c91715646c7d675d1c9c8e41f6fce88246f1318c1aa6a1ed1aeb3c4f032fcdf4ba63cc69c4fe6d634279176b5358727d8f2cc1e65b65f43ce2f8bfb0"
 }
