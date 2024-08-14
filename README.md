@@ -35,7 +35,7 @@ Then SVG files can be imported as React components:
 import Logo from "./logo.svg?react";
 ```
 
-If you are using TypeScript, there is also a declaration helper for better type inference:
+If you are using TypeScript, there is also a declaration helper for better type inference. Add the following to `vite-env.d.ts`:
 
 ```ts
 /// <reference types="vite-plugin-svgr/client" />
