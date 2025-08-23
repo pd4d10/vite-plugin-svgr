@@ -3,6 +3,12 @@ import type { Config } from "@svgr/core";
 import fs from "fs";
 import type { Plugin } from "vite";
 import { transformWithEsbuild } from "vite";
+import * as viteModule from "vite";
+
+// @ts-ignore - check if transformWithOxc is available, i.e. rolldown-vite is installed and aliased
+let useOxc = viteModule.transformWithOxc != null;
+// @ts-ignore - assign transformer function
+let transformWith: typeof transformWithEsbuild = useOxc ? viteModule.transformWithOxc : transformWithEsbuild;
 
 export interface VitePluginSvgrOptions {
   svgrOptions?: Config;
@@ -38,7 +44,11 @@ export default function vitePluginSvgr({
           },
         });
 
-        const res = await transformWithEsbuild(componentCode, id, {
+        const res = await transformWith(componentCode, id, useOxc ? {
+          // @ts-ignore - "lang" is required for transformWithOxc
+          lang: "jsx",
+          ...esbuildOptions,
+        } : {
           loader: "jsx",
           ...esbuildOptions,
         });
