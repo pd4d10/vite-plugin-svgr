@@ -1,8 +1,13 @@
 name: Release
+
+permissions:
+  contents: write
+
 on:
   push:
     tags:
-      - v*
+      - "v*"
+
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -10,9 +15,13 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: actions/setup-node@v4
+
+      - name: Set node
+        uses: actions/setup-node@v4
         with:
-          node-version: 16.x
-      - run: npx changelogithub
+          registry-url: https://registry.npmjs.org/
+          node-version: lts/*
+
+      - run: npx changelogithub # or changelogithub@0.12 to ensure a stable result
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
