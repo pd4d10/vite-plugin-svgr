@@ -5,11 +5,11 @@ import type { Plugin } from "vite";
 import { transformWithEsbuild } from "vite";
 import * as viteModule from "vite";
 
-// @ts-ignore - check if transformWithOxc is available, i.e. rolldown-vite is installed and aliased
-let useOxc = viteModule.transformWithOxc != null;
-// @ts-ignore - assign transformer function
+// check if transformWithOxc is available, i.e. rolldown-vite is installed and aliased
+let useOxc = (viteModule as any).transformWithOxc != null;
+// assign transformer function
 let transformWith: typeof transformWithEsbuild = useOxc
-  ? viteModule.transformWithOxc
+  ? (viteModule as any).transformWithOxc
   : transformWithEsbuild;
 
 export interface VitePluginSvgrOptions {
