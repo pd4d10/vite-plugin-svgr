@@ -1,18 +1,17 @@
-import { createFilter, FilterPattern } from "@rollup/pluginutils";
-import type { Config } from "@svgr/core";
-import fs from "fs";
-import type { Plugin } from "vite";
-import { transformWithEsbuild } from "vite";
-import * as viteModule from "vite";
-
-// @ts-ignore - check if transformWithOxc is available, i.e. rolldown-vite is installed and aliased
-let useOxc = viteModule.transformWithOxc != null;
-// @ts-ignore - assign transformer function
-let transformWith: typeof transformWithEsbuild = useOxc ? viteModule.transformWithOxc : transformWithEsbuild;
+import { createFilter, type FilterPattern } from "@rollup/pluginutils";
+import { transform as svgrTransform, type Config } from "@svgr/core";
+import jsx from "@svgr/plugin-jsx";
+import fs from "node:fs";
+import type {
+  EsbuildTransformOptions,
+  Plugin,
+  TransformOptions as OxcTransformOptions,
+} from "vite";
 
 export interface VitePluginSvgrOptions {
   svgrOptions?: Config;
-  esbuildOptions?: Parameters<typeof transformWithEsbuild>[2];
+  esbuildOptions?: EsbuildTransformOptions;
+  oxcOptions?: OxcTransformOptions;
   exclude?: FilterPattern;
   include?: FilterPattern;
 }
@@ -20,6 +19,7 @@ export interface VitePluginSvgrOptions {
 export default function vitePluginSvgr({
   svgrOptions,
   esbuildOptions,
+  oxcOptions,
   include = "**/*.svg?react",
   exclude,
 }: VitePluginSvgrOptions = {}): Plugin {
@@ -30,27 +30,26 @@ export default function vitePluginSvgr({
     name: "vite-plugin-svgr",
     enforce: "pre", // to override `vite:asset`'s behavior
     async load(id) {
-      if (filter(id)) {
-        const { transform } = await import("@svgr/core");
-        const { default: jsx } = await import("@svgr/plugin-jsx");
+      if (!filter(id)) {
+        return;
+      }
 
-        const filePath = id.replace(postfixRE, "");
-        const svgCode = await fs.promises.readFile(filePath, "utf8");
+      const filePath = id.replace(postfixRE, "");
+      const svgCode = await fs.promises.readFile(filePath, "utf8");
+      const componentCode = await svgrTransform(svgCode, svgrOptions, {
+        filePath,
+        caller: {
+          defaultPlugins: [jsx],
+        },
+      });
+      const meta = (this as { meta?: { rolldownVersion?: string } } | undefined)?.meta;
 
-        const componentCode = await transform(svgCode, svgrOptions, {
-          filePath,
-          caller: {
-            defaultPlugins: [jsx],
-          },
-        });
-
-        const res = await transformWith(componentCode, id, useOxc ? {
-          // @ts-ignore - "lang" is required for transformWithOxc
+      if (meta?.rolldownVersion != null) {
+        /* c8 ignore next */
+        const { transformWithOxc } = await import("vite");
+        const res = await transformWithOxc(componentCode, id, {
           lang: "jsx",
-          ...esbuildOptions,
-        } : {
-          loader: "jsx",
-          ...esbuildOptions,
+          ...oxcOptions,
         });
 
         return {
@@ -58,6 +57,18 @@ export default function vitePluginSvgr({
           map: null, // TODO:
         };
       }
+
+      /* c8 ignore next */
+      const { transformWithEsbuild } = await import("vite");
+      const res = await transformWithEsbuild(componentCode, id, {
+        loader: "jsx",
+        ...esbuildOptions,
+      });
+
+      return {
+        code: res.code,
+        map: null, // TODO:
+      };
     },
   };
 }
