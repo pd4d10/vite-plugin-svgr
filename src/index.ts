@@ -1,6 +1,5 @@
 import { createFilter, type FilterPattern } from "@rollup/pluginutils";
-import { transform as svgrTransform, type Config } from "@svgr/core";
-import jsx from "@svgr/plugin-jsx";
+import type { Config } from "@svgr/core";
 import fs from "node:fs";
 import type {
   EsbuildTransformOptions,
@@ -38,6 +37,8 @@ export default function vitePluginSvgr({
 
       const filePath = id.replace(postfixRE, "");
       const svgCode = await fs.promises.readFile(filePath, "utf8");
+      const { transform: svgrTransform } = await import("@svgr/core");
+      const { default: jsx } = await import("@svgr/plugin-jsx");
       const componentCode = await svgrTransform(svgCode, svgrOptions, {
         filePath,
         caller: {
