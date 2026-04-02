@@ -6,10 +6,43 @@ import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 
+import type { Plugin } from "vite";
+
 import vitePluginSvgr from "../src/index.ts";
 
 const repoRoot = fileURLToPath(new URL("..", import.meta.url));
 const pluginEntryUrl = new URL("../src/index.ts", import.meta.url).href;
+
+type LoadHook = Extract<NonNullable<Plugin["load"]>, (...args: any[]) => any>;
+type LoadContext = ThisParameterType<LoadHook>;
+type LoadHookResult = Awaited<ReturnType<LoadHook>>;
+type TransformResult = Extract<NonNullable<LoadHookResult>, { code: string }>;
+
+function getLoadHook(plugin: Plugin): LoadHook {
+  const load = plugin.load;
+
+  assert.ok(load, "Expected plugin.load to be defined");
+
+  return typeof load === "function" ? load : load.handler;
+}
+
+async function runLoad(
+  plugin: Plugin,
+  id: string,
+  context?: Omit<Partial<LoadContext>, "meta"> & {
+    meta?: Partial<LoadContext["meta"]> & { rolldownVersion?: string };
+  },
+): Promise<LoadHookResult | undefined> {
+  return await getLoadHook(plugin).call(context as LoadContext, id);
+}
+
+function expectTransformResult(
+  result: LoadHookResult | undefined,
+): TransformResult {
+  assert.ok(result && typeof result === "object" && "code" in result);
+
+  return result;
+}
 
 function inspectSvgrResolutions(
   action: "createPlugin" | "nonMatchingLoad" | "matchingLoad",
@@ -88,13 +121,12 @@ test("vitePluginSvgr exposes a pre plugin and only transforms matching ids", asy
 
     assert.equal(plugin.name, "vite-plugin-svgr");
     assert.equal(plugin.enforce, "pre");
-    assert.equal(await plugin.load?.(`${includedFile}`), undefined);
-    assert.equal(await plugin.load?.(`${excludedFile}?react`), undefined);
+    assert.equal(await runLoad(plugin, `${includedFile}`), undefined);
+    assert.equal(await runLoad(plugin, `${excludedFile}?react`), undefined);
 
-    const transformed = await plugin.load?.(`${includedFile}?react`);
-
-    assert.equal(typeof transformed, "object");
-    assert.ok(transformed);
+    const transformed = expectTransformResult(
+      await runLoad(plugin, `${includedFile}?react`),
+    );
     assert.equal(transformed.map, null);
     assert.match(transformed.code, /export default/);
     assert.match(transformed.code, /(React\.createElement|_jsx)\(/);
@@ -124,12 +156,11 @@ test("vitePluginSvgr respects a custom include pattern", async () => {
       include: "**/*.svg?component",
     });
 
-    assert.equal(await plugin.load?.(`${filePath}?react`), undefined);
+    assert.equal(await runLoad(plugin, `${filePath}?react`), undefined);
 
-    const transformed = await plugin.load?.(`${filePath}?component`);
-
-    assert.equal(typeof transformed, "object");
-    assert.ok(transformed);
+    const transformed = expectTransformResult(
+      await runLoad(plugin, `${filePath}?component`),
+    );
     assert.match(transformed.code, /export default/);
     assert.match(transformed.code, /(React\.createElement|_jsx)\(/);
   } finally {
@@ -152,10 +183,9 @@ test("vitePluginSvgr passes SVGR and esbuild options through the esbuild transfo
       esbuildOptions: { jsxFactory: "h" },
     });
 
-    const transformed = await plugin.load?.(`${filePath}?react`);
-
-    assert.equal(typeof transformed, "object");
-    assert.ok(transformed);
+    const transformed = expectTransformResult(
+      await runLoad(plugin, `${filePath}?react`),
+    );
     assert.equal(transformed.map, null);
     assert.match(transformed.code, /export default/);
     assert.match(transformed.code, /h\(/);
@@ -185,13 +215,12 @@ test("vitePluginSvgr passes Oxc options through the rolldown transform", async (
       },
     });
 
-    const transformed = await plugin.load?.call(
-      { meta: { rolldownVersion: "1.0.0" } },
-      `${filePath}?react`,
+    const transformed = expectTransformResult(
+      await runLoad(plugin, `${filePath}?react`, {
+        meta: { rolldownVersion: "1.0.0" },
+      }),
     );
 
-    assert.equal(typeof transformed, "object");
-    assert.ok(transformed);
     assert.equal(transformed.map, null);
     assert.match(transformed.code, /export default/);
     assert.match(transformed.code, /h\(/);
