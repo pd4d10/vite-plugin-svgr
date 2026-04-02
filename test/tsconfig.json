@@ -3,6 +3,7 @@
   "include": ["./**/*.ts", "../src/**/*.ts", "../client.d.ts"],
   "compilerOptions": {
     "noEmit": true,
-    "allowImportingTsExtensions": true
+    "allowImportingTsExtensions": true,
+    "rootDir": ".."
   }
 }
