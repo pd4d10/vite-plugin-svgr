@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, rm, symlink, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -12,6 +12,9 @@ import vitePluginSvgr from "../src/index.ts";
 
 const repoRoot = fileURLToPath(new URL("..", import.meta.url));
 const pluginEntryUrl = new URL("../src/index.ts", import.meta.url).href;
+const tscCliPath = path.join(repoRoot, "node_modules", "typescript", "lib", "tsc.js");
+
+let packageBuildEnsured = false;
 
 type LoadHook = Extract<NonNullable<Plugin["load"]>, (...args: any[]) => any>;
 type LoadContext = ThisParameterType<LoadHook>;
@@ -98,6 +101,38 @@ function inspectSvgrResolutions(
   assert.equal(result.status, 0, result.stderr || result.stdout);
 
   return JSON.parse(result.stdout.trim()) as string[];
+}
+
+function ensurePackageBuilt() {
+  if (packageBuildEnsured) {
+    return;
+  }
+
+  const result = spawnSync("pnpm", ["build"], {
+    cwd: repoRoot,
+    encoding: "utf8",
+  });
+
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+
+  packageBuildEnsured = true;
+}
+
+async function withLinkedPackage(
+  run: (cwd: string) => Promise<void>,
+) {
+  const tempDir = await mkdtemp(path.join(os.tmpdir(), "vite-plugin-svgr-consumer-"));
+  const nodeModulesDir = path.join(tempDir, "node_modules");
+  const linkedPackageDir = path.join(nodeModulesDir, "vite-plugin-svgr");
+
+  await mkdir(nodeModulesDir, { recursive: true });
+  await symlink(repoRoot, linkedPackageDir, "dir");
+
+  try {
+    await run(tempDir);
+  } finally {
+    await rm(tempDir, { recursive: true, force: true });
+  }
 }
 
 test("vitePluginSvgr exposes a pre plugin and only transforms matching ids", async () => {
@@ -227,4 +262,82 @@ test("vitePluginSvgr passes Oxc options through the rolldown transform", async (
   } finally {
     await rm(tempDir, { recursive: true, force: true });
   }
+});
+
+test("CommonJS require returns the plugin function", async () => {
+  ensurePackageBuilt();
+
+  await withLinkedPackage(async (cwd) => {
+    const script = `
+      const vitePluginSvgr = require("vite-plugin-svgr");
+
+      if (typeof vitePluginSvgr !== "function") {
+        throw new Error(\`Expected require("vite-plugin-svgr") to return a function, got \${typeof vitePluginSvgr}\`);
+      }
+
+      const plugin = vitePluginSvgr();
+
+      if (plugin.name !== "vite-plugin-svgr") {
+        throw new Error(\`Expected plugin name to be "vite-plugin-svgr", got \${plugin.name}\`);
+      }
+    `;
+    const result = spawnSync(
+      process.execPath,
+      ["--input-type=commonjs", "--eval", script],
+      {
+        cwd,
+        encoding: "utf8",
+      },
+    );
+
+    assert.equal(result.status, 0, result.stderr || result.stdout);
+  });
+});
+
+test("CommonJS TypeScript consumers can use the package without .default", async () => {
+  ensurePackageBuilt();
+
+  await withLinkedPackage(async (cwd) => {
+    const entryPath = path.join(cwd, "index.cts");
+
+    await writeFile(
+      entryPath,
+      [
+        'import vitePluginSvgr = require("vite-plugin-svgr");',
+        "",
+        "const plugin = vitePluginSvgr();",
+        'const options: Parameters<typeof vitePluginSvgr>[0] = { include: "**/*.svg?react" };',
+        "",
+        'if (plugin.name !== "vite-plugin-svgr") {',
+        '  throw new Error("unexpected plugin name");',
+        "}",
+        "",
+        "void options;",
+      ].join("\n"),
+    );
+
+    const result = spawnSync(
+      process.execPath,
+      [
+        tscCliPath,
+        "--pretty",
+        "false",
+        "--noEmit",
+        "--skipLibCheck",
+        "--module",
+        "Node16",
+        "--moduleResolution",
+        "node16",
+        "--target",
+        "ES2022",
+        "index.cts",
+      ],
+      {
+        cwd,
+        encoding: "utf8",
+      },
+    );
+
+    assert.equal(result.status, 0, result.stderr || result.stdout);
+  });
 });

@@ -4,5 +4,5 @@ export default defineConfig({
   format: ["esm", "cjs"],
   dts: true,
   fixedExtension: false,
-  cjsDefault: false,
+  cjsDefault: true,
 });
