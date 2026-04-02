@@ -3,20 +3,27 @@
   "version": "5.1.0",
   "description": "Vite plugin to transform SVGs into React components",
   "type": "module",
-  "main": "./dist/index.js",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     },
     "./client": {
       "types": "./client.d.ts"
     }
   },
   "scripts": {
-    "dev": "tsc --watch",
-    "build": "tsc -p tsconfig.json",
+    "dev": "tsdown --watch",
+    "build": "tsdown",
     "prepare": "npm run build",
     "test": "node --import tsx --test test/**/*.test.ts",
     "test:e2e": "node --import tsx --test test/process.test.ts",
@@ -38,6 +45,7 @@
   "devDependencies": {
     "@types/node": "^24.3.0",
     "c8": "^10.1.3",
+    "tsdown": "^0.21.7",
     "tsx": "^4.21.0",
     "typescript": "^5.9.2",
     "vite": "^8.0.3",
