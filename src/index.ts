@@ -5,8 +5,10 @@ import fs from "node:fs";
 import type {
   EsbuildTransformOptions,
   Plugin,
-  TransformOptions as OxcTransformOptions,
+  transformWithOxc,
 } from "vite";
+
+type OxcTransformOptions = NonNullable<Parameters<typeof transformWithOxc>[2]>;
 
 export interface VitePluginSvgrOptions {
   svgrOptions?: Config;
