@@ -37,6 +37,9 @@ export default function vitePluginSvgr({
 
       const filePath = id.replace(postfixRE, "");
       const svgCode = await fs.promises.readFile(filePath, "utf8");
+      // `tsx` injects an import-interop helper here during tests, which adds
+      // an unreachable branch to coverage for these ESM-only modules.
+      /* c8 ignore next 2 */
       const { transform: svgrTransform } = await import("@svgr/core");
       const { default: jsx } = await import("@svgr/plugin-jsx");
       const componentCode = await svgrTransform(svgCode, svgrOptions, {
