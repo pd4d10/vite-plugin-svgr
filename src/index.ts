@@ -1,11 +1,12 @@
-import { createFilter, type FilterPattern } from "@rollup/pluginutils";
 import type { Config } from "@svgr/core";
 import fs from "node:fs";
 import type {
   EsbuildTransformOptions,
   Plugin,
   transformWithOxc,
+  FilterPattern,
 } from "vite";
+import { createFilter } from "vite";
 
 type OxcTransformOptions = NonNullable<Parameters<typeof transformWithOxc>[2]>;
 
