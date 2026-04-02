@@ -20,7 +20,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           registry-url: https://registry.npmjs.org/
-          node-version: lts/*
+          node-version-file: .nvmrc
 
       - run: npx changelogithub # or changelogithub@0.12 to ensure a stable result
         env:
