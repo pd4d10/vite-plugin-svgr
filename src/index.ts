@@ -1,11 +1,12 @@
-import { createFilter, type FilterPattern } from "@rollup/pluginutils";
 import type { Config } from "@svgr/core";
 import fs from "node:fs";
 import type {
   EsbuildTransformOptions,
   Plugin,
   transformWithOxc,
+  FilterPattern,
 } from "vite";
+import { createFilter } from "vite";
 
 type OxcTransformOptions = NonNullable<Parameters<typeof transformWithOxc>[2]>;
 
@@ -15,6 +16,7 @@ interface VitePluginSvgrOptions {
   oxcOptions?: OxcTransformOptions;
   exclude?: FilterPattern;
   include?: FilterPattern;
+  jsxRuntime?: "classic" | "automatic";
 }
 
 export default function vitePluginSvgr({
@@ -23,6 +25,7 @@ export default function vitePluginSvgr({
   oxcOptions,
   include = "**/*.svg?react",
   exclude,
+  jsxRuntime,
 }: VitePluginSvgrOptions = {}): Plugin {
   const filter = createFilter(include, exclude);
   const postfixRE = /[?#].*$/s;
@@ -42,19 +45,28 @@ export default function vitePluginSvgr({
       /* c8 ignore next 2 */
       const { transform: svgrTransform } = await import("@svgr/core");
       const { default: jsx } = await import("@svgr/plugin-jsx");
-      const componentCode = await svgrTransform(svgCode, svgrOptions, {
-        filePath,
-        caller: {
-          defaultPlugins: [jsx],
+      const componentCode = await svgrTransform(
+        svgCode,
+        {
+          jsxRuntime,
+          ...svgrOptions,
         },
-      });
-      const meta = (this as { meta?: { rolldownVersion?: string } } | undefined)?.meta;
+        {
+          filePath,
+          caller: {
+            defaultPlugins: [jsx],
+          },
+        },
+      );
+      const meta = (this as { meta?: { rolldownVersion?: string } } | undefined)
+        ?.meta;
 
       if (meta?.rolldownVersion != null) {
         /* c8 ignore next */
         const { transformWithOxc } = await import("vite");
         const res = await transformWithOxc(componentCode, id, {
           lang: "jsx",
+          jsx: { runtime: jsxRuntime },
           ...oxcOptions,
         });
 
@@ -68,6 +80,7 @@ export default function vitePluginSvgr({
       const { transformWithEsbuild } = await import("vite");
       const res = await transformWithEsbuild(componentCode, id, {
         loader: "jsx",
+        ...(jsxRuntime === "automatic" ? { jsx: "automatic" } : {}),
         ...esbuildOptions,
       });
 

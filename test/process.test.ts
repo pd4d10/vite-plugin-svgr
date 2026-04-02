@@ -9,7 +9,10 @@ import vitePluginSvgr from "../src/index.ts";
 
 const fixtureRoot = fileURLToPath(new URL("./fixtures/basic", import.meta.url));
 const reactStubPath = path.join(fixtureRoot, "react-stub.js");
-const reactJsxRuntimeStubPath = path.join(fixtureRoot, "react-jsx-runtime-stub.js");
+const reactJsxRuntimeStubPath = path.join(
+  fixtureRoot,
+  "react-jsx-runtime-stub.js",
+);
 
 async function withServer(
   pluginOptions: Parameters<typeof vitePluginSvgr>[0],
@@ -45,7 +48,7 @@ test("vite transforms an svg request into a React component module", async () =>
     assert.match(importer.code, /react/);
 
     assert.ok(transformedSvg);
-    assert.match(transformedSvg.code, /(import \* as React from|react\/jsx-runtime)/);
+    assert.match(transformedSvg.code, /(import \* as React from|jsx-runtime)/);
     assert.match(transformedSvg.code, /(React\.createElement|_jsx)\(/);
     assert.match(transformedSvg.code, /viewBox: "0 0 10 10"/);
     assert.match(transformedSvg.code, /export default/);
@@ -57,7 +60,7 @@ test("vite respects a custom include query in the full transform flow", async ()
     const transformedSvg = await server.transformRequest("/logo.svg?component");
 
     assert.ok(transformedSvg);
-    assert.match(transformedSvg.code, /(import \* as React from|react\/jsx-runtime)/);
+    assert.match(transformedSvg.code, /(import \* as React from|jsx-runtime)/);
     assert.match(transformedSvg.code, /(React\.createElement|_jsx)\(/);
     assert.match(transformedSvg.code, /export default/);
   });

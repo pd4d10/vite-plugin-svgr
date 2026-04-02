@@ -164,7 +164,7 @@ test("vitePluginSvgr exposes a pre plugin and only transforms matching ids", asy
     );
     assert.equal(transformed.map, null);
     assert.match(transformed.code, /export default/);
-    assert.match(transformed.code, /(React\.createElement|_jsx)\(/);
+    assert.match(transformed.code, /(React\.createElement|_jsx|jsx)\(/);
   } finally {
     await rm(tempDir, { recursive: true, force: true });
   }
@@ -185,7 +185,10 @@ test("vitePluginSvgr respects a custom include pattern", async () => {
   const filePath = path.join(tempDir, "logo.svg");
 
   try {
-    await writeFile(filePath, '<svg viewBox="0 0 8 8"><path d="M0 0h8v8H0z" /></svg>');
+    await writeFile(
+      filePath,
+      '<svg viewBox="0 0 8 8"><path d="M0 0h8v8H0z" /></svg>',
+    );
 
     const plugin = vitePluginSvgr({
       include: "**/*.svg?component",
@@ -197,7 +200,7 @@ test("vitePluginSvgr respects a custom include pattern", async () => {
       await runLoad(plugin, `${filePath}?component`),
     );
     assert.match(transformed.code, /export default/);
-    assert.match(transformed.code, /(React\.createElement|_jsx)\(/);
+    assert.match(transformed.code, /(React\.createElement|_jsx|jsx)\(/);
   } finally {
     await rm(tempDir, { recursive: true, force: true });
   }
@@ -226,6 +229,27 @@ test("vitePluginSvgr passes SVGR and esbuild options through the esbuild transfo
     assert.match(transformed.code, /h\(/);
     assert.match(transformed.code, /width: "1em"/);
     assert.match(transformed.code, /height: "1em"/);
+  } finally {
+    await rm(tempDir, { recursive: true, force: true });
+  }
+});
+
+test("vitePluginSvgr jsxRuntime classic uses React.createElement via esbuild", async () => {
+  const tempDir = await mkdtemp(path.join(os.tmpdir(), "vite-plugin-svgr-"));
+  const filePath = path.join(tempDir, "logo.svg");
+
+  try {
+    await writeFile(
+      filePath,
+      '<svg viewBox="0 0 8 8"><path d="M0 0h8v8H0z" /></svg>',
+    );
+
+    const plugin = vitePluginSvgr({ jsxRuntime: "classic" });
+    const transformed = await plugin.load?.(`${filePath}?react`);
+
+    assert.equal(typeof transformed, "object");
+    assert.ok(transformed);
+    assert.match(transformed.code, /React\.createElement\(/);
   } finally {
     await rm(tempDir, { recursive: true, force: true });
   }
