@@ -9,7 +9,7 @@ import type {
 
 type OxcTransformOptions = NonNullable<Parameters<typeof transformWithOxc>[2]>;
 
-interface VitePluginSvgrOptions {
+export interface VitePluginSvgrOptions {
   svgrOptions?: Config;
   esbuildOptions?: EsbuildTransformOptions;
   oxcOptions?: OxcTransformOptions;
