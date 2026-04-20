@@ -1,6 +1,7 @@
 {
   "name": "codemods",
   "version": "0.0.0",
+  "license": "MIT",
   "type": "commonjs",
   "exports": {
     "./package.json": "./package.json"
