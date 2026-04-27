@@ -65,6 +65,13 @@ svgr({
 
   //  A minimatch pattern, or array of patterns, which specifies the files in the build the plugin should ignore. By default no files are ignored.
   exclude: "",
+
+  // Optional: Rolldown-native id filter for the `load` hook. When set,
+  // Rolldown rejects non-matching ids in Rust before invoking the hook,
+  // avoiding JS↔Rust FFI overhead per module load. Has no effect under
+  // non-Rolldown bundlers (the legacy include/exclude filter still applies).
+  // See https://rolldown.rs/in-depth/why-plugin-hook-filter
+  rolldownFilter: { id: /\.svg\?react(?:[?#&]|$)/ },
 });
 ```
 

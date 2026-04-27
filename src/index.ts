@@ -9,12 +9,34 @@ import type {
 
 type OxcTransformOptions = NonNullable<Parameters<typeof transformWithOxc>[2]>;
 
+/**
+ * Rolldown-native id filter shape. When set on the plugin, Rolldown evaluates
+ * the filter in Rust before crossing into JS, eliminating per-module FFI
+ * overhead in the `load` hook for non-matching ids.
+ *
+ * https://rolldown.rs/in-depth/why-plugin-hook-filter
+ */
+type RolldownIdFilter = {
+  id?: RegExp | { include?: RegExp | RegExp[]; exclude?: RegExp | RegExp[] };
+};
+
 interface VitePluginSvgrOptions {
   svgrOptions?: Config;
   esbuildOptions?: EsbuildTransformOptions;
   oxcOptions?: OxcTransformOptions;
   exclude?: FilterPattern;
   include?: FilterPattern;
+  /**
+   * Opt-in Rolldown-native id filter applied to the `load` hook. When set,
+   * Rolldown rejects non-matching ids in Rust before invoking the hook,
+   * avoiding the JS↔Rust FFI crossing for every module load. Has no effect
+   * under non-Rolldown bundlers (the legacy JS-side `include`/`exclude`
+   * filter still applies).
+   *
+   * @example
+   * vitePluginSvgr({ rolldownFilter: { id: /\.svg\?react(?:[?#&]|$)/ } })
+   */
+  rolldownFilter?: RolldownIdFilter;
 }
 
 export default function vitePluginSvgr({
@@ -23,14 +45,13 @@ export default function vitePluginSvgr({
   oxcOptions,
   include = "**/*.svg?react",
   exclude,
+  rolldownFilter,
 }: VitePluginSvgrOptions = {}): Plugin {
   const filter = createFilter(include, exclude);
   const postfixRE = /[?#].*$/s;
 
-  return {
-    name: "vite-plugin-svgr",
-    enforce: "pre", // to override `vite:asset`'s behavior
-    async load(id) {
+  const handler: Extract<NonNullable<Plugin["load"]>, (...args: any[]) => any> =
+    async function (id) {
       if (!filter(id)) {
         return;
       }
@@ -48,7 +69,8 @@ export default function vitePluginSvgr({
           defaultPlugins: [jsx],
         },
       });
-      const meta = (this as { meta?: { rolldownVersion?: string } } | undefined)?.meta;
+      const meta = (this as { meta?: { rolldownVersion?: string } } | undefined)
+        ?.meta;
 
       if (meta?.rolldownVersion != null) {
         /* c8 ignore next */
@@ -75,6 +97,13 @@ export default function vitePluginSvgr({
         code: res.code,
         map: null, // TODO:
       };
-    },
+    };
+
+  return {
+    name: "vite-plugin-svgr",
+    enforce: "pre", // to override `vite:asset`'s behavior
+    load: rolldownFilter
+      ? ({ filter: rolldownFilter, handler } as Plugin["load"])
+      : handler,
   };
 }
