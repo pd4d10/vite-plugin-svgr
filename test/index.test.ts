@@ -264,6 +264,40 @@ test("vitePluginSvgr passes Oxc options through the rolldown transform", async (
   }
 });
 
+test("vitePluginSvgr exposes the rolldown filter shape when rolldownFilter is set", async () => {
+  const tempDir = await mkdtemp(path.join(os.tmpdir(), "vite-plugin-svgr-"));
+  const filePath = path.join(tempDir, "logo.svg");
+
+  try {
+    await writeFile(
+      filePath,
+      '<svg viewBox="0 0 4 4"><path d="M0 0h4v4H0z" /></svg>',
+    );
+
+    const idFilter = /\.svg\?react(?:[?#&]|$)/;
+    const plugin = vitePluginSvgr({
+      rolldownFilter: { id: idFilter },
+    });
+
+    assert.ok(plugin.load && typeof plugin.load === "object");
+    assert.deepEqual(plugin.load.filter, { id: idFilter });
+
+    const transformed = expectTransformResult(
+      await runLoad(plugin, `${filePath}?react`),
+    );
+    assert.match(transformed.code, /export default/);
+    assert.match(transformed.code, /(React\.createElement|_jsx)\(/);
+  } finally {
+    await rm(tempDir, { recursive: true, force: true });
+  }
+});
+
+test("vitePluginSvgr exposes the legacy load function when rolldownFilter is not set", () => {
+  const plugin = vitePluginSvgr();
+
+  assert.equal(typeof plugin.load, "function");
+});
+
 test("CommonJS require returns the plugin function", async () => {
   ensurePackageBuilt();
 
